@@ -1,18 +1,18 @@
 ---
-entries:
+repos:
 - id: openshift-ansible
-  source: https://github.com/openshift/openshift-ansible.git
-  copy:
+  url: https://github.com/openshift/openshift-ansible.git
+  transfers:
 
   # Copy everything in roles/* into roles/ in the output dir.
   # Allows for merging multiple directories into one.
-  - from: roles/
-    to: roles/
+  - src: roles/
+    dst: roles/
 
   # Copy a directory itself to the output dir:
-  - from: examples
-    to: examples
+  - src: examples
+    dst: examples
 
   # Copy individual files:
-  - from: playbooks/something.yml
-    to: playbooks/
+  - src: playbooks/something.yml
+    dst: playbooks/

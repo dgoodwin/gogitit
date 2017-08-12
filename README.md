@@ -39,29 +39,6 @@ name-play would have been.
   * Support multiple sub-directories coming out of one git repo without re-cloning multiple times.
   * Support keeping a cache of git clones in tmp just update them on execution. (much more time/bandwidth efficient)
 
-## Example Manifest
-
-```
----
-entries:
-- id: openshift-ansible
-  source: https://github.com/openshift/openshift-ansible.git
-  copy:
-
-  # Copy everything in roles/* into roles/ in the output dir.
-  # Allows for merging multiple directories into one.
-  - from: roles/
-    to: roles/
-
-  # Copy a directory itself to the output dir:
-  - from: examples
-    to: examples
-
-  # Copy individual files:
-  - from: playbooks/something.yml
-    to: playbooks/
-```
-
 # Installation
 
 TBD

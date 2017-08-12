@@ -10,7 +10,10 @@ def main():
 def sync(manifest):
     """Fetch all remote sources and assemble into the destination directory."""
     click.echo("Executing sync")
-    gogitit.manifest.load(manifest)
+    m = gogitit.manifest.load(manifest)
+    click.echo(m.repos[0])
+    for t in m.repos[0].transfers:
+        click.echo("- %s" % t)
 
 @click.command()
 def check():
