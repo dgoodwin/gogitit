@@ -16,14 +16,16 @@ class Manifest(object):
 
 class Repo(object):
     def __init__(self, **kwargs):
+        # TODO: repoid must be valid for a directory name as we use it in caches:
         self.id = kwargs['id']
-        self.source = kwargs['url']
+        self.url = kwargs['url']
+        self.version = kwargs.get('version', 'master')
         self.transfers = []
         for t in kwargs['transfers']:
             self.transfers.append(Transfer(**t))
 
     def __str__(self):
-        return "Repo<id=%s url=%s>" % (self.id, self.source)
+        return "Repo<id=%s url=%s version=%s>" % (self.id, self.url, self.version)
 
 class Transfer(object):
     def __init__(self, **kwargs):

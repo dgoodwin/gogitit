@@ -2,6 +2,7 @@
 repos:
 - id: openshift-ansible
   url: https://github.com/openshift/openshift-ansible.git
+  version: release-3.6
   transfers:
 
   # Copy everything in roles/* into roles/ in the output dir.

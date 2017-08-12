@@ -8,6 +8,7 @@ setup(
     install_requires=[
         'Click',
         'pyyaml',
+        'GitPython',
     ],
     entry_points={
         'console_scripts': ['gogitit=gogitit.cli:main'],
