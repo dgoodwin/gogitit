@@ -91,14 +91,22 @@ class Copy(object):
 
     def run(self, output_dir):
         # List of tuples, source file or path, dest path:
-        fulldest = os.path.join(output_dir, self.dst)
+        copy_to_dir = os.path.join(output_dir, self.dst)
         copy_pairs = []
         for match in self.files_matched:
-            copy_pairs.append((match, fulldest))
+            copy_pairs.append((match, copy_to_dir))
 
         for pair in copy_pairs:
             click.echo("%s -> %s" % pair)
             if os.path.isdir(pair[0]):
+                # If copying a dir, cleanup the target dir. Appending a / here if it's
+                # a directory as not doing so causes bugs with copying the source dir name
+                # into a nested dir of the same name.
+                full_dest_dir = os.path.abspath(os.path.join(copy_to_dir,
+                    os.path.basename(pair[0] + "/")))
+                if os.path.exists(full_dest_dir):
+                    click.echo("  Deleting old contents of: %s" % full_dest_dir)
+                    shutil.rmtree(full_dest_dir)
                 shutil.copytree(pair[0], pair[1])
             else:
                 # Make sure directory exists for the file copy:
@@ -106,5 +114,4 @@ class Copy(object):
                 if not os.path.exists(dest_dir):
                     os.makedirs(dest_dir)
                 shutil.copy2(pair[0], pair[1])
-
 
