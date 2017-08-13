@@ -2,18 +2,29 @@
 repos:
 - id: openshift-ansible
   url: https://github.com/openshift/openshift-ansible.git
-  version: release-3.6
-  transfers:
+  version: v3.0.2-2
+
+  copy:
 
   # Copy everything in roles/* into roles/ in the output dir.
   # Allows for merging multiple directories into one.
+  #  - src: roles/*
+  #  dst: ./
+
   - src: roles/
-    dst: roles/
+    dst: roles
+
+    #- src: roles/*
+    #dst: roles/
 
   # Copy a directory itself to the output dir:
-  - src: examples
-    dst: examples
+  - src: inventory
+    dst: inventory
 
   # Copy individual files:
-  - src: playbooks/something.yml
+  - src: playbooks/byo/openshift-cluster/config.yml
+    dst: playbooks/cluster-config.yml
+    #
+  # Copy individual files:
+  - src: playbooks/byo/vagrant.yml
     dst: playbooks/
