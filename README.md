@@ -39,9 +39,15 @@ name-play would have been.
   * Support multiple sub-directories coming out of one git repo without re-cloning multiple times.
   * Support keeping a cache of git clones in tmp just update them on execution. (much more time/bandwidth efficient)
 
+## Example Manifest
+
+Coming soon. See the [manifest-example.yml](manifest-example.yml) for the work in progress.
+
 # Installation
 
 TBD
+
+Hoping to just distribute as a Python package. rpm via copr is also on the table.
 
 # Hacking
 
