@@ -1,18 +1,18 @@
 # gogitit
 
-gogigit assembles parses a manifest and assembled an output directory
-consisting of portions of multiple remote git repositories and sub-directories
-within them.
+gogigit parses a manifest and assembles an output directory consisting of
+portions of multiple remote git repositories and sub-directories within them,
+at the refs/tags/heads you specify.
 
-It's intended use is for an operations team which needs to consume Ansible
-roles and playbooks from a variety of other teams. At present however the solution
-is generic and not tied to Ansible.
-
-It is effectively a vendoring tool but allows merging into one tree as this is
+It is effectively a vendoring tool but allows merging into one tree, as this is
 helpful when assembling ansible roles and playbooks from many locations. Whether or
-not the resulting output directory is checked into git is up to the user (for now).
+not the resulting output directory is commited to git is up to the user. (for now)
 
-Written in Python, not Go (though it almost was!), despite how awesome the
+It's intended use is for an operations team which needs to consume and run
+Ansible roles and playbooks from a variety of other teams. At present however
+the solution is generic and not tied to Ansible.
+
+Written in Python, not Go (though it almost was), despite how awesome the
 name-play would have been.
 
 ## Behavior
@@ -58,5 +58,4 @@ virtualenv-3 venv
 . venv/bin/activate
 pip3 install --editable .
 ```
-
 
