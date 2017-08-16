@@ -2,13 +2,17 @@ import click
 import gogitit.manifest
 import os
 
+
 @click.command()
-@click.option('--manifest', '-m', default='manifest.yml', type=click.File('r'),
+@click.option(
+        '--manifest', '-m', default='manifest.yml', type=click.File('r'),
         help="Location of manifest that defines what to fetch and sync.")
-@click.option('--cache-dir', default=os.path.expanduser('~/.gogitit/cache'),
+@click.option(
+        '--cache-dir', default=os.path.expanduser('~/.gogitit/cache'),
         type=click.Path(file_okay=False, dir_okay=True, writable=True, readable=True),
         help="Directory where gogitit will store cached copies of repositories.")
-@click.option('--output-dir', '-o', default=os.path.abspath('./'),
+@click.option(
+        '--output-dir', '-o', default=os.path.abspath('./'),
         type=click.Path(file_okay=False, dir_okay=True, writable=True, readable=True),
         help="Directory where all output will be assembled into final structure.")
 def sync(manifest, cache_dir, output_dir):
@@ -34,6 +38,7 @@ def sync(manifest, cache_dir, output_dir):
         for copy in repo.copy:
             copy.run(output_dir)
 
+
 @click.command()
 def check():
     """
@@ -42,13 +47,9 @@ def check():
     """
     click.echo("Checking destination directory.")
 
-@click.group()
-def main():
-    pass
-
-main.add_command(sync)
-main.add_command(check)
 
 if __name__ == '__main__':
+    main = click.Group()
+    main.add_command(sync)
+    main.add_command(check)
     main()
-

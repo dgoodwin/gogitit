@@ -8,6 +8,7 @@ import click
 import git
 import yaml
 
+
 def load(f, cache_dir):
     data = yaml.safe_load(f)
     # TODO: validation
@@ -24,6 +25,7 @@ class Manifest(object):
 
 
 class Repo(object):
+
     def __init__(self, cache_dir, **kwargs):
         self.cache_dir = cache_dir
 
@@ -67,8 +69,12 @@ class Repo(object):
             else:
                 raise e
 
+    # Alias __repr__ to __str__
+    __repr__ = __str__
+
 
 class Copy(object):
+
     def __init__(self, repo_dir, **kwargs):
         self.repo_dir = repo_dir
         self.src = kwargs['src']
@@ -83,7 +89,8 @@ class Copy(object):
     def validate(self):
         source = os.path.join(self.repo_dir, self.src)
         click.echo("source = %s" % source)
-        mode = None
+        # mode is unused
+        # mode = None
         self.files_matched = glob.glob(source)
         click.echo(self.files_matched)
         if len(self.files_matched) == 0 and not os.path.exists(source):
@@ -102,7 +109,8 @@ class Copy(object):
                 # If copying a dir, cleanup the target dir. Appending a / here if it's
                 # a directory as not doing so causes bugs with copying the source dir name
                 # into a nested dir of the same name.
-                full_dest_dir = os.path.abspath(os.path.join(copy_to_dir,
+                full_dest_dir = os.path.abspath(os.path.join(
+                    copy_to_dir,
                     os.path.basename(pair[0] + "/")))
                 if os.path.exists(full_dest_dir):
                     click.echo("  Deleting old contents of: %s" % full_dest_dir)
@@ -115,3 +123,5 @@ class Copy(object):
                     os.makedirs(dest_dir)
                 shutil.copy2(pair[0], pair[1])
 
+    # Alias __repr__ to __str__
+    __repr__ = __str__
