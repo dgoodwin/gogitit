@@ -55,19 +55,16 @@ class Repo(object):
             click.echo("Re-using repo cache: %s" % self.repo_dir)
 
         git_repo = git.Repo(self.repo_dir)
-        git_repo = git.Git(self.repo_dir)
-        click.echo("Checking out version: %s" % self.version)
-        git_repo.fetch('origin')
-        git_repo.checkout(self.version)
+        click.echo("Fetching remotes.")
+        git_repo.remotes.origin.fetch()
 
-        # Try to git pull, but this won't work if version is a tag or commit:
-        try:
-            git_repo.pull()
-        except git.exc.GitCommandError as e:
-            if 'You are not currently on a branch' in e.stderr:
-                pass
-            else:
-                raise e
+        if self.version in git_repo.remotes.origin.refs:
+            click.echo("Checking out branch: %s" % self.version)
+            git_repo.remotes.origin.refs[self.version].checkout(force=True)
+        else:
+            click.echo("Checking out ref: %s" % self.version)
+            raw_repo = git.Git(self.repo_dir)
+            raw_repo.checkout(self.version)
 
     # Alias __repr__ to __str__
     __repr__ = __str__
@@ -113,9 +110,11 @@ class Copy(object):
                     copy_to_dir,
                     os.path.basename(pair[0] + "/")))
                 if os.path.exists(full_dest_dir):
-                    click.echo("  Deleting old contents of: %s" % full_dest_dir)
+                    click.echo("Deleting old contents of: %s" % full_dest_dir)
                     shutil.rmtree(full_dest_dir)
-                shutil.copytree(pair[0], pair[1])
+                click.echo("copying tree")
+                shutil.copytree(pair[0], pair[1], symlinks=True)
+                click.echo("copy completed")
             else:
                 # Make sure directory exists for the file copy:
                 dest_dir = os.path.dirname(os.path.abspath(pair[1]))

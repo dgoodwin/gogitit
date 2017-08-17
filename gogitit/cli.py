@@ -5,7 +5,7 @@ import os
 
 @click.command()
 @click.option(
-        '--manifest', '-m', default='manifest.yml', type=click.File('r'),
+        '--manifest', '-m', default='gogitit.yml', type=click.File('r'),
         help="Location of manifest that defines what to fetch and sync.")
 @click.option(
         '--cache-dir', default=os.path.expanduser('~/.gogitit/cache'),
