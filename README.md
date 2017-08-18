@@ -59,3 +59,10 @@ virtualenv-3 venv
 pip3 install --editable .
 ```
 
+Optionally check flake8 happiness:
+
+```
+pip3 install flake8
+python setup.py flake8
+```
+

@@ -48,8 +48,14 @@ def check():
     click.echo("Checking destination directory.")
 
 
+@click.group()
+def main():
+    pass
+
+
+main.add_command(sync)
+main.add_command(check)
+
+
 if __name__ == '__main__':
-    main = click.Group()
-    main.add_command(sync)
-    main.add_command(check)
     main()
