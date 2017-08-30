@@ -50,3 +50,6 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Aug 30 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.1-1
+- Initial rpm build and release.
+
