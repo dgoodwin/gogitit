@@ -89,37 +89,43 @@ class Copy(object):
         # mode is unused
         # mode = None
         self.files_matched = glob.glob(source)
+        click.echo("Files to copy:")
         click.echo(self.files_matched)
         if len(self.files_matched) == 0 and not os.path.exists(source):
             raise click.ClickException("src does not exist in repo: %s" % source)
 
     def run(self, output_dir):
+        """ Copy all files to output dir. """
         # List of tuples, source file or path, dest path:
-        copy_to_dir = os.path.join(output_dir, self.dst)
+        copy_to_dir = output_dir
+        # Skip this is self.dst is '', indicating top level of the output dir.
+        if self.dst:
+            copy_to_dir = os.path.join(output_dir, self.dst)
         copy_pairs = []
         for match in self.files_matched:
             copy_pairs.append((match, copy_to_dir))
 
         for pair in copy_pairs:
-            click.echo("%s -> %s" % pair)
             if os.path.isdir(pair[0]):
                 # If copying a dir, cleanup the target dir. Appending a / here if it's
                 # a directory as not doing so causes bugs with copying the source dir name
                 # into a nested dir of the same name.
-                full_dest_dir = os.path.abspath(os.path.join(
+                full_dest_dir = os.path.join(
                     copy_to_dir,
-                    os.path.basename(pair[0] + "/")))
+                    os.path.basename(pair[0]))
                 if os.path.exists(full_dest_dir):
                     click.echo("Deleting old contents of: %s" % full_dest_dir)
                     shutil.rmtree(full_dest_dir)
                 click.echo("copying tree")
-                shutil.copytree(pair[0], pair[1], symlinks=True)
+                click.echo("%s -> %s" % (pair[0], full_dest_dir))
+                shutil.copytree(pair[0], full_dest_dir, symlinks=True)
                 click.echo("copy completed")
             else:
                 # Make sure directory exists for the file copy:
                 dest_dir = os.path.dirname(os.path.abspath(pair[1]))
                 if not os.path.exists(dest_dir):
                     os.makedirs(dest_dir)
+                click.echo("%s -> %s" % pair)
                 shutil.copy2(pair[0], pair[1])
 
     # Alias __repr__ to __str__
