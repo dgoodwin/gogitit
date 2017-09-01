@@ -4,7 +4,7 @@
 
 Name: gogitit
 Version: 0.3
-Release: 1%{?dist}
+Release: 2
 Summary: A tool for fetching files from a number of git repositories and versions.
 Source0: gogitit-%{version}.tar.gz
 
@@ -50,6 +50,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Sep 01 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.3-2
+- Fix broken setuptools link on RHEL 7. (dgoodwin@redhat.com)
+
 * Fri Sep 01 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.3-1
 - Drop Python 3 for Python 2 to better support RHEL/CentOS.
   (dgoodwin@redhat.com)
