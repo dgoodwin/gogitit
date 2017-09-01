@@ -39,6 +39,37 @@ name-play would have been.
   * Support multiple sub-directories coming out of one git repo without re-cloning multiple times.
   * Support keeping a cache of git clones in tmp just update them on execution. (much more time/bandwidth efficient)
 
+## Examples
+
+The following examples would be indented beneath the respective "copy" section
+of a repo in your manifest.
+
+Copy an entire directory, you must explicitly reference the full destination
+directory name. (i.e. you cannot just use dst of 'roles' here and assume myrole
+will be the resulting directory) This is to avoid confusion around cleanup when
+re-executing sync.
+
+```
+- src: roles/myrole
+  dst: roles/myrole
+```
+
+Copy a specific file, here you do not have to specify the full filename if you
+do not wish to rename it. You must however include a trailing slash on the dst,
+otherwise we have to assume you wanted to copy to a file named 'playbooks'.
+
+```
+- src: playbooks/create.yml
+  dst: playbooks/
+```
+
+Copy with wildcards:
+
+```
+- src: roles/*env*
+  dst: roles
+```
+
 ## Example Manifest
 
 Coming soon. See the [manifest-example.yml](manifest-example.yml) for the work in progress.

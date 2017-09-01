@@ -10,6 +10,7 @@ setup(
         'Click',
         'pyyaml',
         'GitPython',
+        'nose',
     ],
     entry_points={
         'console_scripts': ['gogitit=gogitit.cli:main'],
