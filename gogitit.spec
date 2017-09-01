@@ -14,7 +14,7 @@ URL: https://github.com/dgoodwin/gogitit
 
 BuildArch: noarch
 
-Requires: python2-setuptools
+Requires: python-setuptools
 Requires: python2-GitPython
 Requires: python2-click
 
@@ -22,7 +22,7 @@ Requires: python2-click
 Requires: PyYAML
 
 BuildRequires: python2-devel
-BuildRequires: python2-setuptools
+BuildRequires: python-setuptools
 
 %description
 Gogitit is a tool for fetching files and directories from various git
