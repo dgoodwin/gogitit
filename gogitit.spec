@@ -1,7 +1,5 @@
-%global use_python3 1
-%global use_python2 0
-%global pythonbin %{__python3}
-%global python_sitelib %{python3_sitelib}
+%global pythonbin %{__python2}
+%global python_sitelib %{python2_sitelib}
 %{!?python_sitelib: %define python_sitelib %(%{pythonbin} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: gogitit
@@ -16,13 +14,15 @@ URL: https://github.com/dgoodwin/gogitit
 
 BuildArch: noarch
 
-Requires: python3-setuptools
-Requires: python3-GitPython
-Requires: python3-click
-Requires: python3-PyYAML
+Requires: python2-setuptools
+Requires: python2-GitPython
+Requires: python2-click
 
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
+# NOTE: should be python3-PyYAML if we got back to Python 3.
+Requires: PyYAML
+
+BuildRequires: python2-devel
+BuildRequires: python2-setuptools
 
 %description
 Gogitit is a tool for fetching files and directories from various git

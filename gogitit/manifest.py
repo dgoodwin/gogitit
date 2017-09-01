@@ -110,20 +110,22 @@ class Copy(object):
                 full_dest_dir = os.path.join(copy_to_dir, os.path.basename(match))
             copy_pairs.append((match, full_dest_dir))
 
-        click.echo("copying files")
         for pair in copy_pairs:
             if os.path.isdir(pair[0]):
                 # If copying a dir, cleanup the target dir to remove old files:
                 full_dest_dir = pair[1]
                 if os.path.exists(full_dest_dir):
-                    click.echo("deleting contents of before copy: %s" % full_dest_dir)
+                    click.echo("deleting previous contents of: %s" % full_dest_dir)
                     shutil.rmtree(full_dest_dir)
                 click.echo("copying %s -> %s" % (pair[0], full_dest_dir))
                 shutil.copytree(pair[0], full_dest_dir, symlinks=True)
                 click.echo("   done")
             else:
                 # Make sure directory exists for the file copy:
-                os.makedirs(pair[1], exist_ok=True)
+                if pair[1][-1] == '/' and not os.path.exists(pair[1]):
+                    os.makedirs(pair[1])
+                elif not os.path.exists(os.path.dirname(pair[1])):
+                    os.makedirs(os.path.dirname(pair[1]))
 
                 click.echo("%s -> %s" % pair)
                 shutil.copy2(pair[0], pair[1])

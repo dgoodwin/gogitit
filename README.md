@@ -82,18 +82,18 @@ Hoping to just distribute as a Python package. rpm via copr is also on the table
 
 # Hacking
 
-Targetting python3 because 2017.
+Staying on Python 2 for the time being, need to run on RHEL 7 as well as Fedora.
 
 ```
-virtualenv-3 venv
+virtualenv venv
 . venv/bin/activate
-pip3 install --editable .
+pip install --editable .
 ```
 
 Optionally check flake8 happiness:
 
 ```
-pip3 install flake8
+pip install flake8
 python setup.py flake8
 ```
 
