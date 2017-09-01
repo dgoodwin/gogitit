@@ -5,7 +5,7 @@
 %{!?python_sitelib: %define python_sitelib %(%{pythonbin} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: gogitit
-Version: 0.1
+Version: 0.2
 Release: 1%{?dist}
 Summary: A tool for fetching files from a number of git repositories and versions.
 Source0: gogitit-%{version}.tar.gz
@@ -50,6 +50,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Sep 01 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.2-1
+- Require more specific dst when copying dirs. (dgoodwin@redhat.com)
+
 * Wed Aug 30 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.1-1
 - Initial rpm build and release.
 
