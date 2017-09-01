@@ -158,6 +158,14 @@ class SyncTests(IntegrationFixture):
         self._assert_exists('roles/dummyrole1/tasks/main.yml')
         self._assert_exists('roles/dummyrole2/tasks/main.yml', False)
 
+    def test_top_level_dir(self):
+        manifest = build_manifest_str('master', [('./', 'vendor/output')])
+        result = self._run_sync(manifest)
+        self.assertEqual(0, result.exit_code)
+        self._assert_exists('vendor/output/roles/dummyrole1/tasks/main.yml')
+        self._assert_exists('vendor/output/roles/dummyrole2/tasks/main.yml')
+        self._assert_exists('vendor/output/.git', False)
+
     def test_subdir_dst_slash(self):
         manifest = build_manifest_str('master', [('roles/dummyrole1', 'roles/dummyrole1/')])
         result = self._run_sync(manifest)

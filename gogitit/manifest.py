@@ -118,7 +118,8 @@ class Copy(object):
                     click.echo("deleting previous contents of: %s" % full_dest_dir)
                     shutil.rmtree(full_dest_dir)
                 click.echo("copying %s -> %s" % (pair[0], full_dest_dir))
-                shutil.copytree(pair[0], full_dest_dir, symlinks=True)
+
+                shutil.copytree(pair[0], full_dest_dir, symlinks=True, ignore=shutil.ignore_patterns('.git'))
                 click.echo("   done")
             else:
                 # Make sure directory exists for the file copy:
