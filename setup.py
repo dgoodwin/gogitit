@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='gogitit',
-    version='0.2',
+    version='0.3',
     packages=['gogitit'],
     include_package_data=True,
     install_requires=[
