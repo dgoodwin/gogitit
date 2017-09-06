@@ -21,21 +21,24 @@ CHECK_STATUS_SHA_CHANGED = 3  # if branch SHA1 has changed
 def load(f, cache_dir):
     data = yaml.safe_load(f)
     # TODO: validation
-    m = Manifest(cache_dir, **data)
+    m = Manifest(f.name, cache_dir, **data)
     return m
 
 
 class Manifest(object):
-    def __init__(self, cache_dir, **kwargs):
+    def __init__(self, path, cache_dir, **kwargs):
+        self.path = path
         self.cache_dir = cache_dir
+        self.output_dir = kwargs['output_dir']
         self.repos = []
         for r in kwargs['repos']:
-            self.repos.append(Repo(cache_dir, **r))
+            self.repos.append(Repo(self, cache_dir, **r))
 
 
 class Repo(object):
 
-    def __init__(self, cache_dir, **kwargs):
+    def __init__(self, manifest, cache_dir, **kwargs):
+        self.manifest = manifest
         self.cache_dir = cache_dir
 
         # TODO: repoid must be valid for a directory name as we use it in caches:
@@ -104,10 +107,10 @@ class Copy(object):
         if len(self.files_matched) == 0 and not os.path.exists(source):
             raise click.ClickException("src does not exist in repo: %s" % source)
 
-    def sha_check(self, status, output_dir):
-        copy_to_dir = output_dir
+    def sha_check(self, status):
+        copy_to_dir = self.repo.manifest.output_dir
         if self.dst:
-            copy_to_dir = os.path.join(output_dir, self.dst)
+            copy_to_dir = os.path.join(self.repo.manifest.output_dir, self.dst)
 
         copy_pairs = self._build_copy_pairs(copy_to_dir)
         for src, dest in copy_pairs:
@@ -132,12 +135,12 @@ class Copy(object):
             copy_pairs.append((match, full_dest_dir))
         return copy_pairs
 
-    def run(self, output_dir, status):
+    def run(self, status):
         """ Copy all files to output dir. """
         # Watch out for dst = '' indicating top level of output dir:
-        copy_to_dir = output_dir
+        copy_to_dir = self.repo.manifest.output_dir
         if self.dst:
-            copy_to_dir = os.path.join(output_dir, self.dst)
+            copy_to_dir = os.path.join(self.repo.manifest.output_dir, self.dst)
 
         # List of tuples, source file or path, dest path:
         copy_pairs = self._build_copy_pairs(copy_to_dir)

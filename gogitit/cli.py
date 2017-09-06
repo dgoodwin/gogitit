@@ -19,7 +19,7 @@ CACHE_FILE = ".gogitit-cache.yml"
         type=click.Path(file_okay=False, dir_okay=True, writable=True, readable=True),
         help="Directory where gogitit will store cached copies of repositories.")
 @click.option(
-        '--output-dir', '-o', default=os.path.abspath('./'),
+        '--output-dir', '-o', default=None,
         type=click.Path(file_okay=False, dir_okay=True, writable=True, readable=True),
         help="Directory where all output will be assembled into final structure.")
 def sync(manifest_file, cache_dir, output_dir):
@@ -31,6 +31,9 @@ def sync(manifest_file, cache_dir, output_dir):
         os.makedirs(cache_dir)
 
     manifest = gogitit.manifest.load(manifest_file, cache_dir)
+    output_dir = setup_output_dir(manifest, output_dir)
+    click.echo("Using output directory: %s" % output_dir)
+
     click.echo(manifest.repos[0])
     for copy in manifest.repos[0].copy:
         click.echo("- %s" % copy)
@@ -48,7 +51,7 @@ def sync(manifest_file, cache_dir, output_dir):
 
     for repo in manifest.repos:
         for copy in repo.copy:
-            copy.run(output_dir, status)
+            copy.run(status)
 
     click.echo(status)
 
@@ -56,6 +59,23 @@ def sync(manifest_file, cache_dir, output_dir):
     f = open(os.path.join(output_dir, CACHE_FILE), 'w')
     f.write(yaml.dump(status))
     f.close()
+
+
+def setup_output_dir(manifest, cli_output_dir):
+    """ Normalize the manifest output dir with the optional CLI override. """
+    if not manifest.output_dir and not cli_output_dir:
+        click.echo("No output dir defined in manifest or CLI argument.")
+        sys.exit(1)
+
+    if cli_output_dir:
+        manifest.output_dir = cli_output_dir
+    else:
+        # Make the manifest output_dir relative to manifest location if not absolute:
+        if manifest.output_dir[0] != '/':
+            manifest.output_dir = os.path.abspath(os.path.join(
+                os.path.dirname(manifest.path), manifest.output_dir))
+
+    return manifest.output_dir
 
 
 @click.command()
@@ -67,7 +87,7 @@ def sync(manifest_file, cache_dir, output_dir):
         type=click.Path(file_okay=False, dir_okay=True, writable=True, readable=True),
         help="Directory where gogitit will store cached copies of repositories.")
 @click.option(
-        '--output-dir', '-o', default=os.path.abspath('./'),
+        '--output-dir', '-o', default=None,
         type=click.Path(file_okay=False, dir_okay=True, writable=True, readable=True),
         help="Directory where all output will be assembled into final structure.")
 def check(manifest_file, cache_dir, output_dir):
@@ -75,9 +95,10 @@ def check(manifest_file, cache_dir, output_dir):
     Scan the destination directory and it's cache and check if contents
     match current manifest.
     """
+    manifest = gogitit.manifest.load(manifest_file, cache_dir)
+    output_dir = setup_output_dir(manifest, output_dir)
     click.echo("Checking if sync is required for output directory: %s" % output_dir)
 
-    manifest = gogitit.manifest.load(manifest_file, cache_dir)
     status_filepath = os.path.join(output_dir, CACHE_FILE)
     click.echo(status_filepath)
     if not os.path.exists(status_filepath):
@@ -105,7 +126,7 @@ def check(manifest_file, cache_dir, output_dir):
     # All repos in cache should now have checked out the correct SHA:
     for repo in manifest.repos:
         for copy in repo.copy:
-            copy.sha_check(status, output_dir)
+            copy.sha_check(status)
 
 
 CACHE_FILE = '.gogitit-cache.yml'

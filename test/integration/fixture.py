@@ -36,12 +36,13 @@ class IntegrationFixture(unittest.TestCase):
         return manifest_path
 
     def _run_check(self, manifest, output_dir=None):
-        if not output_dir:
-            output_dir = self.output_dir
         manifest_path = self.write_manifest(manifest)
         runner = CliRunner()
-        result = runner.invoke(cli.main, ['check', '-m', manifest_path, "-o", output_dir,
-            "--cache-dir", self.cache_dir])
+        args = ['check', '-m', manifest_path,
+            "--cache-dir", self.cache_dir]
+        if output_dir:
+            args = args.extend(["-o", output_dir])
+        result = runner.invoke(cli.main, args)
         self.debug_result(result)
         return result
 
@@ -73,18 +74,21 @@ class IntegrationFixture(unittest.TestCase):
             for file in files:
                 print("%s %s" % (len(path) * '-', file))
 
-
-def build_manifest_str(version, src_dest_pairs):
-    """ Build a manifest string from given git version (commit, branch, or tag)
-    and src/dst tuple pairs. """
-    base = """---
+    def build_manifest_str(self, version, src_dest_pairs):
+        """ Build a manifest string from given git version (commit, branch, or tag)
+        and src/dst tuple pairs. """
+        base = """---
+output_dir: ./
 repos:
 - id: testrepo
   url: https://github.com/dgoodwin/gogitit-test.git
   version: %s
-  copy:""" % version
-    for src, dst in src_dest_pairs:
-        base += """
-  - src: %s
-    dst: %s""" % (src, dst)
-    return base
+  copy:""" % (version)
+
+        for src, dst in src_dest_pairs:
+            base += """
+      - src: %s
+        dst: %s""" % (src, dst)
+        return base
+
+
