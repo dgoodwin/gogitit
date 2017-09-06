@@ -3,10 +3,19 @@
 import os
 import glob
 import shutil
+import sys
 
 import click
 import git
 import yaml
+
+
+# These exit status codes represent the various reasons why check may fail,
+# indicating that a sync is required.
+CHECK_STATUS_NO_STATUS_FILE = 1
+CHECK_STATUS_MANIFEST_CHANGED = 2  # manifest checksum changed
+CHECK_STATUS_SHA_CHANGED = 3  # if branch SHA1 has changed
+# TODO: separate code for files not in status? status that didn't match any files?
 
 
 def load(f, cache_dir):
@@ -40,7 +49,7 @@ class Repo(object):
 
         self.copy = []
         for t in kwargs['copy']:
-            self.copy.append(Copy(self.repo_dir, **t))
+            self.copy.append(Copy(self, **t))
 
     def __str__(self):
         return "Repo<id=%s url=%s version=%s>" % (self.id, self.url, self.version)
@@ -66,14 +75,17 @@ class Repo(object):
             raw_repo = git.Git(self.repo_dir)
             raw_repo.checkout(self.version)
 
+        self.sha = git_repo.head.commit.hexsha
+        click.echo("Will sync git commit: %s" % self.sha)
+
     # Alias __repr__ to __str__
     __repr__ = __str__
 
 
 class Copy(object):
 
-    def __init__(self, repo_dir, **kwargs):
-        self.repo_dir = repo_dir
+    def __init__(self, repo, **kwargs):
+        self.repo = repo
         self.src = kwargs['src']
         self.dst = kwargs['dst']
 
@@ -84,7 +96,7 @@ class Copy(object):
         return "Copy<src=%s dst=%s>" % (self.src, self.dst)
 
     def validate(self):
-        source = os.path.join(self.repo_dir, self.src)
+        source = os.path.join(self.repo.repo_dir, self.src)
         click.echo("source = %s" % source)
         # mode is unused
         # mode = None
@@ -92,7 +104,35 @@ class Copy(object):
         if len(self.files_matched) == 0 and not os.path.exists(source):
             raise click.ClickException("src does not exist in repo: %s" % source)
 
-    def run(self, output_dir):
+    def sha_check(self, status, output_dir):
+        copy_to_dir = output_dir
+        if self.dst:
+            copy_to_dir = os.path.join(output_dir, self.dst)
+
+        copy_pairs = self._build_copy_pairs(copy_to_dir)
+        for src, dest in copy_pairs:
+            if dest not in status['paths']:
+                click.echo("%s missing in status, sync is required." % dest)
+                # TODO: should not sys.exit in here
+                sys.exit(CHECK_STATUS_SHA_CHANGED)
+            if self.repo.sha != status['paths'][dest]:
+                click.echo("Commit changed for repo %s, sync is required." % self.repo.id)
+                sys.exit(CHECK_STATUS_SHA_CHANGED)
+
+    def _build_copy_pairs(self, copy_to_dir):
+        """ Return list of tuples matching source path to full destination path. """
+        copy_pairs = []
+        for match in self.files_matched:
+            # When copying a directory without a glob we require you to specify the exact
+            # destination with directory name to copy as. If however you use a glob which matches
+            # to a directory, we need to copy to an exact dir of dst + your globbed dir name.
+            full_dest_dir = copy_to_dir
+            if match != os.path.join(self.repo.repo_dir, self.src) and os.path.isdir(match):
+                full_dest_dir = os.path.join(copy_to_dir, os.path.basename(match))
+            copy_pairs.append((match, full_dest_dir))
+        return copy_pairs
+
+    def run(self, output_dir, status):
         """ Copy all files to output dir. """
         # Watch out for dst = '' indicating top level of output dir:
         copy_to_dir = output_dir
@@ -100,16 +140,7 @@ class Copy(object):
             copy_to_dir = os.path.join(output_dir, self.dst)
 
         # List of tuples, source file or path, dest path:
-        copy_pairs = []
-        for match in self.files_matched:
-            # When copying a directory without a glob we require you to specify the exact
-            # destination with directory name to copy as. If however you use a glob which matches
-            # to a directory, we need to copy to an exact dir of dst + your globbed dir name.
-            full_dest_dir = copy_to_dir
-            if match != os.path.join(self.repo_dir, self.src) and os.path.isdir(match):
-                full_dest_dir = os.path.join(copy_to_dir, os.path.basename(match))
-            copy_pairs.append((match, full_dest_dir))
-
+        copy_pairs = self._build_copy_pairs(copy_to_dir)
         for pair in copy_pairs:
             if os.path.isdir(pair[0]):
                 # If copying a dir, cleanup the target dir to remove old files:
@@ -130,6 +161,10 @@ class Copy(object):
 
                 click.echo("%s -> %s" % pair)
                 shutil.copy2(pair[0], pair[1])
+
+            if 'paths' not in status:
+                status['paths'] = {}
+            status['paths'][pair[1]] = self.repo.sha
 
     # Alias __repr__ to __str__
     __repr__ = __str__
