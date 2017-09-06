@@ -3,8 +3,8 @@
 %{!?python_sitelib: %define python_sitelib %(%{pythonbin} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: gogitit
-Version: 0.3
-Release: 2
+Version: 0.4
+Release: 1
 Summary: A tool for fetching files from a number of git repositories and versions.
 Source0: gogitit-%{version}.tar.gz
 
@@ -50,6 +50,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Sep 06 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.4-1
+- Set output dir in manifest by default, override with CLI optionally.
+  (dgoodwin@redhat.com)
+- Add check command to see if a sync is required. (dgoodwin@redhat.com)
+- Do not copy .git directories. (dgoodwin@redhat.com)
+
 * Fri Sep 01 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.3-2
 - Fix broken setuptools link on RHEL 7. (dgoodwin@redhat.com)
 
