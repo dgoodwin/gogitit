@@ -72,7 +72,9 @@ class Repo(object):
 
         if self.version in git_repo.remotes.origin.refs:
             click.echo("Checking out branch: %s" % self.version)
-            git_repo.remotes.origin.refs[self.version].checkout(force=True)
+            g = git_repo.git
+            g.checkout("origin/%s" % self.version)
+
         else:
             click.echo("Checking out ref: %s" % self.version)
             raw_repo = git.Git(self.repo_dir)
