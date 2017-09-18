@@ -15,8 +15,8 @@ URL: https://github.com/dgoodwin/gogitit
 BuildArch: noarch
 
 Requires: python-setuptools
-Requires: python2-GitPython
-Requires: python2-click
+Requires: GitPython
+Requires: python-click
 
 # NOTE: should be python3-PyYAML if we got back to Python 3.
 Requires: PyYAML
