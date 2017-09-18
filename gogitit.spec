@@ -4,7 +4,7 @@
 
 Name: gogitit
 Version: 0.4
-Release: 1
+Release: 2
 Summary: A tool for fetching files from a number of git repositories and versions.
 Source0: gogitit-%{version}.tar.gz
 
@@ -50,6 +50,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Sep 18 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.4-2
+- Fix dep names for EPEL7, should work on Fedora as well. (dgoodwin@redhat.com)
+
 * Wed Sep 06 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.4-1
 - Set output dir in manifest by default, override with CLI optionally.
   (dgoodwin@redhat.com)
