@@ -24,7 +24,6 @@ CACHE_FILE = ".gogitit-cache.yml"
         help="Directory where all output will be assembled into final structure.")
 def sync(manifest_file, cache_dir, output_dir):
     """Fetch all remote sources and assemble into the destination directory."""
-    click.echo("Executing sync to output directory: %s" % output_dir)
     # Make sure the working directory exists:
     if not os.path.exists(cache_dir):
         click.echo("Creating gogitit cache directory: %s" % cache_dir)
@@ -32,14 +31,13 @@ def sync(manifest_file, cache_dir, output_dir):
 
     manifest = gogitit.manifest.load(manifest_file, cache_dir)
     output_dir = setup_output_dir(manifest, output_dir)
-    click.echo("Using output directory: %s" % output_dir)
+    click.echo("\nSyncing to: %s" % output_dir)
 
-    click.echo(manifest.repos[0])
-    for copy in manifest.repos[0].copy:
-        click.echo("- %s" % copy)
+    click.echo("\nCloning repositories:\n")
 
     # Clone/update all repos:
     for repo in manifest.repos:
+        click.echo("Cloning: %s" % repo.url)
         repo.clone()
         for copy in repo.copy:
             copy.validate()
@@ -47,18 +45,19 @@ def sync(manifest_file, cache_dir, output_dir):
     status = {}
     manifest_file.seek(0)
     status['manifest_sha'] = hashlib.sha1(manifest_file.read()).hexdigest()
-    click.echo("Manifest SHA: %s" % status['manifest_sha'])
+
+    click.echo("\nBuilding output directory:\n")
 
     for repo in manifest.repos:
         for copy in repo.copy:
             copy.run(status)
 
-    click.echo(status)
-
     # Write the cache of what we synced:
     f = open(os.path.join(output_dir, CACHE_FILE), 'w')
     f.write(yaml.dump(status))
     f.close()
+
+    click.echo("\nOutput ready in: %s\n" % output_dir)
 
 
 def setup_output_dir(manifest, cli_output_dir):
