@@ -3,6 +3,7 @@
 import os
 import glob
 import shutil
+import string
 import sys
 
 import click
@@ -23,6 +24,35 @@ def load(f, cache_dir):
     # TODO: validation
     m = Manifest(f.name, cache_dir, **data)
     return m
+
+
+def repo_url_to_dir(repo_url):
+    """
+    Convert a repo URL into a safe relative path we can use in our cache directory.
+    """
+    # drop https:// and file:// prefixes:
+    path = repo_url
+    if '://' in path:
+        path = path.split('://')[1]
+
+    # drop trailing and leading slashes:
+    if path.startswith('/'):
+        path = path[1:]
+    if path.endswith('/'):
+        path = path[:-1]
+
+    # drop trailing.git suffix from repo name:
+    if path.endswith('.git'):
+        path = path[:-4]
+
+    # drop username@ syntax:
+    if '@' in path:
+        path = path.split('@')[1]
+
+    # replace : with /:
+    path = string.replace(path, ':', '/')
+
+    return path
 
 
 class Manifest(object):
@@ -48,7 +78,7 @@ class Repo(object):
         self.version = kwargs.get('version', 'master')
 
         # Location where we maintain a git clone of this repo:
-        self.repo_dir = os.path.join(self.cache_dir, self.id)
+        self.repo_dir = os.path.join(self.cache_dir, repo_url_to_dir(self.url))
 
         self.copy = []
         for t in kwargs['copy']:

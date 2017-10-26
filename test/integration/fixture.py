@@ -80,8 +80,7 @@ class IntegrationFixture(unittest.TestCase):
         base = """---
 output_dir: ./
 repos:
-- id: testrepo
-  url: https://github.com/dgoodwin/gogitit-test.git
+- url: https://github.com/dgoodwin/gogitit-test.git
   version: %s
   copy:""" % (version)
 

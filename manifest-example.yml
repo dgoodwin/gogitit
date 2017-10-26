@@ -1,7 +1,6 @@
 ---
 repos:
-- id: openshift-ansible
-  url: https://github.com/openshift/openshift-ansible.git
+- url: https://github.com/openshift/openshift-ansible.git
   version: v3.0.2-2
 
   copy:
