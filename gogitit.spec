@@ -3,7 +3,7 @@
 %{!?python_sitelib: %define python_sitelib %(%{pythonbin} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name: gogitit
-Version: 0.6
+Version: 0.7
 Release: 1
 Summary: A tool for fetching files from a number of git repositories and versions.
 Source0: gogitit-%{version}.tar.gz
@@ -50,6 +50,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Oct 27 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.7-1
+- Fix a bug with dir cleanup clobbering earlier copy pairs.
+  (dgoodwin@redhat.com)
+
 * Thu Oct 26 2017 Devan Goodwin <dgoodwin@rm-rf.ca> 0.6-1
 - Cleanup CLI output. (dgoodwin@redhat.com)
 - Use cache sub-dirs that reflect the repo URL. (dgoodwin@redhat.com)
