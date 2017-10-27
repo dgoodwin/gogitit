@@ -50,6 +50,10 @@ def sync(manifest_file, cache_dir, output_dir):
 
     for repo in manifest.repos:
         for copy in repo.copy:
+            copy.pre()
+
+    for repo in manifest.repos:
+        for copy in repo.copy:
             copy.run(status)
 
     # Write the cache of what we synced:

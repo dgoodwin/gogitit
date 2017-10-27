@@ -151,3 +151,15 @@ class SyncTests(fixture.IntegrationFixture):
         self._assert_exists('merged/playbook1.yml')
 
 
+    def test_dir_clobber(self):
+        # Testing a bug where files in roles get clobbered by later copying everything
+        # from a source roles dir in.
+        manifest = self.build_manifest_str('master', [('roles/dummyrole2/tasks/main.yml', 'roles/main.yml'),
+            ('roles/*', 'roles/')])
+        result = self._run_sync(manifest)
+        self.assertEqual(0, result.exit_code)
+        self._assert_exists('roles/dummyrole1/tasks/main.yml')
+        self._assert_exists('roles/dummyrole2/tasks/main.yml')
+        self._assert_exists('roles/main.yml')
+
+        # Re-run to trigger cleanup of previous dirs:

@@ -162,6 +162,27 @@ class Copy(object):
             copy_pairs.append((match, full_dest_dir))
         return copy_pairs
 
+    def pre(self):
+        """ Run pre-copy. """
+        # Watch out for dst = '' indicating top level of output dir:
+        copy_to_dir = self.repo.manifest.output_dir
+        if self.dst:
+            copy_to_dir = os.path.join(self.repo.manifest.output_dir, self.dst)
+
+        # Delete all destination directories (when source is also a directory) prior to starting
+        # the copy. This can't be done during because it can potentially clobber other files
+        # already copied into the output dir by other pairs.
+        copy_pairs = self._build_copy_pairs(copy_to_dir)
+        for pair in copy_pairs:
+            if os.path.isdir(pair[0]):
+                # TODO: this can blow away things you've already copied into the dir, i.e. when copying a bunch of roles to 'roles':
+                # If copying a dir, cleanup the target dir to remove old files:
+                full_dest_dir = pair[1]
+                click.echo("Pre: %s" % full_dest_dir)
+                if os.path.exists(full_dest_dir):
+                    click.echo("Deleting previous contents of: %s" % full_dest_dir)
+                    shutil.rmtree(full_dest_dir)
+
     def run(self, status):
         """ Copy all files to output dir. """
         # Watch out for dst = '' indicating top level of output dir:
@@ -173,14 +194,12 @@ class Copy(object):
         copy_pairs = self._build_copy_pairs(copy_to_dir)
         for pair in copy_pairs:
             if os.path.isdir(pair[0]):
+                # TODO: this can blow away things you've already copied into the dir, i.e. when copying a bunch of roles to 'roles':
                 # If copying a dir, cleanup the target dir to remove old files:
                 full_dest_dir = pair[1]
                 click.echo("Copy:")
                 click.echo("  Src: %s" % pair[0])
                 click.echo("  Dest: %s" % full_dest_dir)
-                if os.path.exists(full_dest_dir):
-                    click.echo("  Deleting previous contents of: %s" % full_dest_dir)
-                    shutil.rmtree(full_dest_dir)
 
                 shutil.copytree(pair[0], full_dest_dir, symlinks=True, ignore=shutil.ignore_patterns('.git'))
                 click.echo("  Done.")
