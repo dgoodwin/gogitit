@@ -59,7 +59,7 @@ class Manifest(object):
     def __init__(self, path, cache_dir, **kwargs):
         self.path = path
         self.cache_dir = cache_dir
-        self.output_dir = kwargs['output_dir']
+        self.output_dir = kwargs.get('output_dir', None)
         self.repos = []
         for r in kwargs['repos']:
             self.repos.append(Repo(self, cache_dir, **r))
